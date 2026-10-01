@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>A Mansão Montenegro</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;800&family=EB+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b0813;--pn:#181226;--ink:#e9e1f0;--mut:#9a8fb0;--gd:#e2b765;--bl:#7fd0d6;--rd:#c4506a;--ln:#3a2f55;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;margin:0}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{background:var(--bg);color:var(--ink);font:19px/1.45 "EB Garamond",Georgia,serif;overflow:hidden}
+h1,h2,.cz{font-family:Cinzel,Georgia,serif}
+#app{height:100%;max-width:700px;margin:0 auto;display:flex;flex-direction:column;position:relative}
+button{font:inherit;color:var(--ink);background:linear-gradient(#2a2145,#1b1530);border:1px solid var(--gd);border-radius:10px;padding:10px 14px;cursor:pointer;text-align:left;touch-action:manipulation}
+button:active{transform:scale(.97);filter:brightness(1.3)}
+button:disabled{opacity:.45}
+button:focus-visible{outline:2px solid var(--bl);outline-offset:2px}
+#top{display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--pn);border-bottom:1px solid var(--ln);flex:none}
+#top .cz{flex:1;font-size:15px;color:var(--gd)}
+#san{width:90px;height:10px;background:#000a;border-radius:5px;overflow:hidden;border:1px solid var(--ln)}
+#san i{display:block;height:100%;background:linear-gradient(var(--bl),#3a8f98);transition:width .4s}
+#top button{padding:6px 10px;font-size:16px}
+#sc{flex:1;overflow:auto;padding:0 0 16px}
+.art{height:30vh;min-height:160px;position:relative;display:flex;align-items:center;justify-content:center;font-size:clamp(70px,16vh,120px);overflow:hidden;border-bottom:2px solid var(--gd)}
+.art span{filter:drop-shadow(0 0 22px #e2b76588);position:relative;z-index:1}
+.art::before,.art::after{content:"";position:absolute;inset:-20%;background:radial-gradient(ellipse at 30% 60%,#ffffff22,#0000 60%);animation:fog 14s linear infinite alternate}
+.art::after{background:radial-gradient(ellipse at 70% 40%,#7fd0d622,#0000 55%);animation-duration:19s;animation-direction:alternate-reverse}
+@keyframes fog{to{transform:translateX(18%) scale(1.15)}}
+.pad{padding:12px 14px}
+.nm{font-size:24px;margin:0 0 4px;color:var(--gd)}
+.ds{margin:0 0 12px;color:#d3c9e2;font-style:italic}
+.lb{margin:12px 0 6px;color:var(--mut);font-size:15px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.ex{border-color:var(--bl)}
+.dn{opacity:.55;border-style:dashed}
+#md{position:absolute;inset:0;background:#000c;display:none;align-items:center;justify-content:center;padding:14px;z-index:5}
+#md.on{display:flex}
+.bx{background:linear-gradient(#241a3d,#130e22);border:2px solid var(--gd);border-radius:14px;padding:16px;width:100%;max-width:520px;max-height:100%;overflow:auto;animation:pop .25s}
+@keyframes pop{from{opacity:0;transform:translateY(10px)}}
+.bx h2{margin:0 0 8px;color:var(--gd);font-size:21px}
+.bx p{margin:8px 0}
+.bx .row{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.cl{border-left:3px solid var(--bl);padding:4px 10px;margin:8px 0;background:#0005}
+.cl b{color:var(--bl)}
+.tt{text-align:center}
+.tt h1{font-size:clamp(32px,9vw,52px);color:var(--gd);margin:6px 0;text-shadow:0 0 30px #e2b76566;line-height:1.05}
+.big{font-size:60px;margin:0}
+#end{position:absolute;inset:0;z-index:8;background:radial-gradient(ellipse at 50% 0,#2b1f4a,#07050c 70%);display:none;overflow:auto;padding:24px 18px}
+#end.on{display:block}
+#end>div{max-width:560px;margin:0 auto}
+@media(prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+</head>
+<body>
+<div id="app">
+ <div id="top"><span class="cz" id="loc"></span><div id="san" title="Sanidade"><i></i></div><button id="jb" aria-label="Diário">📓 <span id="cc">0</span></button></div>
+ <div id="sc"></div>
+ <div id="md"><div class="bx" id="bx"></div></div>
+ <div id="end"><div id="eb"></div></div>
+</div>
+<script>
+const $=s=>document.querySelector(s);
+const PT={m:['🔮','Lúcia, a Médium'],d:['🕵️','Caio, o Detetive'],p:['✝️','Padre Elias']};
+const R={
+hall:{n:'Saguão de Entrada',e:'🏛️',g:'#33264f,#0d0916',d:'Um lustre quebrado pende do teto. Retratos de olhos riscados observam você. Ao fundo, uma música antiga toca, vinda de lugar nenhum.',
+ o:[{i:'lareira',n:'Lareira apagada',e:'🔥',t:'Entre as cinzas há velas intactas. Vocês acendem algumas e a luz traz um pouco de alívio.',san:12},
+    {i:'caixa',n:'Caixa de música',e:'🎶',t:'É dela que vem a melodia. Sob o fundo falso há um <b>medalhão</b> com o retrato de um homem desconhecido. Na tampa: “Quem dá a palavra, a si se prende.”',c:{id:'med',t:'Medalhão de Tomás',x:'Retrato de um homem estranho à família. Inscrição: “Quem dá a palavra, a si se prende.”',s:1}}],
+ x:['biblio','jantar','porao','quarto']},
+biblio:{n:'Biblioteca',e:'📚',g:'#2f3a2c,#0b100a',d:'Estantes até o teto, livros caídos, cheiro de papel velho. Uma escrivaninha ainda guarda a marca de um tinteiro.',
+ gh:{t:'Um sussurro folheia as páginas sozinho. A silhueta de um homem de bengala aponta a estante e chora.',b:'m',v:'Pela voz do espírito você entende: “Eu prometi… e não cumpri.”'},
+ o:[{i:'diario',n:'Diário do patriarca',e:'📖',t:'Augusto Montenegro escreve: “Jurei a meu irmão Tomás, no leito de nossa mãe, que a herança seria dividida ao meio. Hoje Helena e Ricardo pedem que eu esqueça a promessa. Ele chega amanhã à noite…”',c:{id:'c1',t:'Diário de Augusto',x:'Augusto jurou dividir a herança com o irmão Tomás. A família pressionou para quebrar a promessa. Tomás chegaria na noite do desaparecimento.',ok:1}},
+    {i:'recorte',n:'Recorte de jornal',e:'📰',t:'Manchete: “Incêndio consome ala leste da mansão Montenegro; família perece”. Estranho: o papel é novo demais, e a mansão não tem sinal de fogo.',c:{id:'f1',t:'Recorte de jornal',x:'Diz que um incêndio matou a família. A mansão não tem marcas de fogo e o papel parece recente.'}}],x:['hall']},
+jantar:{n:'Sala de Jantar',e:'🍽️',g:'#4a2630,#12080b',d:'Uma mesa comprida ainda posta, com pratos cobertos de poeira. Taças trincadas e um relógio parado às 23h07.',
+ gh:{t:'As cadeiras se arrastam sozinhas. Uma sombra risca algo no ar, de novo e de novo.',b:'d',v:'Caio nota uma oitava marca de cadeira no chão. Alguém foi apagado daquela mesa.'},
+ o:[{i:'foto',n:'Fotografia emoldurada',e:'🖼️',t:'A ceia da última noite: sete Montenegro e um oitavo homem, de rosto riscado a faca. No verso: “Tomás, 1ª vez à mesa. Que Deus nos perdoe.”',c:{id:'c2',t:'Fotografia da ceia',x:'Um oitavo homem, Tomás, esteve à mesa naquela noite. Seu rosto foi riscado depois.',ok:1}},
+    {i:'carta',n:'Carta anônima',e:'✉️',t:'“O mordomo Honório envenenou o vinho por vingança.” A tinta é fresca e a letra imita a de Helena, mas há erros que ela nunca cometeria.',c:{id:'f2',t:'Carta anônima',x:'Acusa o mordomo Honório de envenenar a ceia. A tinta parece recente e a letra, falsificada.'}}],x:['hall']},
+quarto:{n:'Quarto Principal',e:'🛏️',g:'#3b2150,#0e0817',d:'Cama de dossel rasgada, espelho coberto por um lençol. No alto da escada, uma porta ao fim do corredor está selada com correntes.',
+ gh:{t:'Uma mulher de preto penteia os cabelos diante do espelho e murmura: “Foi só para protegê-lo… só para protegê-lo…”',b:'p',v:'A prece acalma o espírito. Ele aponta o criado-mudo e a cabeceira da cama.'},
+ o:[{i:'chave',n:'Chave escondida',e:'🗝️',t:'Atrás da cabeceira, uma chave de ferro enegrecido. Na haste está gravado “ÚLTIMO ANDAR”.',k:1,c:{id:'key',t:'Chave do último andar',x:'Abre a porta selada no fim do corredor.',s:1}},
+    {i:'cartaH',n:'Carta de Helena',e:'💌',t:'“Ricardo, o testamento será lido amanhã. Se Tomás subir ao último andar, trancamos a porta. Ninguém deve saber que ele existe.”',c:{id:'c3',t:'Carta de Helena',x:'Helena e Ricardo planejaram trancar Tomás no último andar para impedir a divisão da herança.',ok:1}}],x:['hall','topo']},
+porao:{n:'Porão',e:'🕳️',g:'#1d2a33,#05080b',d:'Umidade, barris podres e correntes enferrujadas. Uma única tocha ainda arde, sem ninguém para acendê-la.',
+ gh:{t:'Correntes arrastam no escuro. Uma voz grave: “Debaixo das pedras… tudo foi escondido.”',b:'d',v:'À luz da tocha, Caio vê um tijolo solto atrás de um barril.'},
+ o:[{i:'docs',n:'Documentos secretos',e:'📜',t:'No esconderijo há o testamento original, assinado por Augusto: metade de tudo para Tomás. Há um segundo papel, rasgado, ordenando a destruição do testamento.',c:{id:'c4',t:'Testamento original',x:'O testamento dividia a herança com Tomás. A família ordenou destruí-lo.',ok:1}},
+    {i:'barril',n:'Barril antigo',e:'🛢️',t:'Só vinagre e ratos. Nada de útil aqui.'}],x:['hall']},
+topo:{n:'Último Andar',e:'🚪',g:'#4a1f3d,#0a050a',d:'O ar é gelado. Arranhões marcam a porta por dentro. No centro da sala, uma vela acesa e uma sombra alta, imóvel, esperando por vocês.',x:['quarto']}
+};
+const S={r:'hall',cl:{},it:{},seen:{},done:{},san:100};
+const T=()=>Object.values(S.cl).filter(c=>c.ok).length;
+function modal(h,b){$('#bx').innerHTML=h+'<div class="row">'+b.map((x,i)=>`<button data-i="${i}">${x[0]}</button>`).join('')+'</div>';$('#md').classList.add('on');
+ $('#bx').onclick=e=>{const k=e.target.closest('button');if(k){$('#md').classList.remove('on');b[k.dataset.i][1]&&b[k.dataset.i][1]()}}}
+function setSan(d){S.san=Math.max(0,Math.min(100,S.san+d));$('#san i').style.width=S.san+'%';if(S.san<=0)setTimeout(()=>ending(3,true),400)}
+function render(){
+ const r=R[S.r],k=S.r;$('#loc').textContent=r.n;$('#cc').textContent=Object.keys(S.cl).length;
+ let h=`<div class="art" style="background:linear-gradient(#${r.g.split(',')[0].slice(1)},#${r.g.split(',')[1].slice(1)})"><span>${r.e}</span></div><div class="pad"><h2 class="nm">${r.n}</h2><p class="ds">${r.d}</p>`;
+ if(r.o){h+='<div class="lb">Examinar</div><div class="grid">'+r.o.map(o=>`<button data-o="${o.i}" class="${S.done[o.i]?'dn':''}">${o.e} ${o.n}</button>`).join('')+'</div>'}
+ if(k==='topo')h+=`<div class="lb">A Presença espera</div><div class="grid"><button data-a="rev">🕯️ Revelar a verdade</button><button data-a="sil">🤐 Guardar o silêncio</button></div>`;
+ h+='<div class="lb">Ir para</div><div class="grid">'+r.x.map(x=>`<button class="ex" data-x="${x}">${R[x].e} ${R[x].n}${x==='topo'&&!S.it.key?' 🔒':''}</button>`).join('');
+ if(k==='hall')h+='<button data-a="leave">🚪 Deixar a mansão</button>';
+ $('#sc').innerHTML=h+'</div></div>';$('#sc').scrollTop=0}
+$('#sc').onclick=e=>{const b=e.target.closest('button');if(!b)return;
+ if(b.dataset.x)go(b.dataset.x);else if(b.dataset.o)inspect(b.dataset.o);else if(b.dataset.a)act(b.dataset.a)};
+function go(id){
+ if(id==='topo'&&!S.it.key)return modal('<p>A porta no fim do corredor está selada com correntes. Falta uma chave.</p>',[['Voltar']]);
+ S.r=id;const r=R[id];render();
+ if(id==='topo'&&!S.seen.topo){S.seen.topo=1;S.cl.c5={t:'Local da noite',x:'Arranhões por dentro da porta e a vela de Tomás: foi aqui que ele foi trancado e morreu.',ok:1};render();
+  return modal('<h2>O lugar onde tudo começou</h2><p>Marcas de unhas cobrem a porta pelo lado de dentro. Sob a vela, uma bengala quebrada e um anel de família. Foi aqui que Tomás foi trancado, e foi aqui que ele morreu sozinho, esperando ser ouvido.</p><p>A sombra alta ergue a cabeça. A <b>Presença</b> quer saber o que vocês farão com a verdade.</p>',[['Encarar a Presença']])}
+ if(r.gh&&!S.seen[id]){S.seen[id]=1;ghost(r.gh)}}
+function ghost(g){
+ modal(`<h2>👻 Aparição</h2><p>${g.t}</p><p style="color:var(--mut)">Quem do grupo age?</p>`,Object.keys(PT).map(k=>[PT[k][0]+' '+PT[k][1],()=>{
+  if(k===g.b){setSan(5);modal(`<p>${g.v}</p><p style="color:var(--bl)">O espírito se acalma. Sanidade +5.</p>`,[['Continuar']])}
+  else{setSan(-8);modal('<p>O espírito urra e a temperatura despenca. Vocês recuam, abalados. Sanidade −8.</p>',[['Continuar']])}}]))}
+function inspect(id){
+ const o=Object.values(R).flatMap(r=>r.o||[]).find(x=>x.i===id);
+ if(o.san&&!S.done[id]){setSan(o.san)}
+ const first=!S.done[id];S.done[id]=1;
+ if(o.c&&first){S.cl[o.c.id]={t:o.c.t,x:o.c.x,ok:o.c.ok,s:o.c.s};if(o.k)S.it.key=1}
+ render();modal(`<h2>${o.e} ${o.n}</h2><p>${o.t}</p>${o.c&&first?'<p style="color:var(--bl)">📓 Anotado no diário.</p>':''}${o.san&&first?'<p style="color:var(--bl)">Sanidade +'+o.san+'.</p>':''}`,[['Fechar']])}
+$('#jb').onclick=()=>{const c=Object.values(S.cl);
+ modal(`<h2>📓 Diário de investigação</h2><p style="color:var(--mut);font-size:16px">Nem toda pista é confiável. Confira datas, tinta e fatos.</p>`+(c.length?c.map(x=>`<div class="cl"><b>${x.t}</b><br>${x.x}</div>`).join(''):'<p>Nada ainda. Examine os cômodos.</p>'),[['Fechar']])};
+function act(a){
+ if(a==='leave')return modal('<h2>Deixar a mansão?</h2><p>Vocês voltarão para a cidade.</p>',[['Sair agora',()=>ending(3)],['Ficar']]);
+ if(a==='sil')return modal('<h2>Guardar o silêncio?</h2><p>Esconder a verdade e fugir. A Presença permanecerá.</p>',[['Calar-se',()=>ending(2)],['Voltar']]);
+ if(a==='rev'){
+  if(T()<5)return modal('<p>Vocês sentem que ainda faltam provas. A Presença não aceita palpites: examinem melhor a mansão, lendo os detalhes de cada documento.</p>',[['Voltar']]);
+  modal('<h2>O que aconteceu naquela noite?</h2><p>Diante de todos os fantasmas, vocês dizem em voz alta:</p>',[
+  ['“Um incêndio acidental consumiu a ala leste.”',wrong],['“O mordomo Honório envenenou a ceia por vingança.”',wrong],
+  ['“A família traiu a promessa feita a Tomás e o trancou no último andar.”',()=>ending(1)]])}}
+function wrong(){setSan(-15);modal('<p>As luzes tremem. Os espíritos gritam: <i>“Mentira!”</i> Vocês perdem o fôlego. Sanidade −15.</p>',[['Pensar de novo']])}
+function ending(n,forced){
+ const E=$('#end'),B=$('#eb');let h='',b=[];
+ const base=t=>`<div class="tt">${t}</div>`;
+ if(n===1){h=base(`<p class="big">🕊️</p><h1>Final 1<br>A verdade</h1><p>Vocês contam tudo: a promessa quebrada, a ceia, o testamento destruído, Tomás trancado até morrer. A Presença baixa a cabeça e a sombra se desfaz.</p><p>Um a um, os Montenegro aparecem. Augusto pede perdão ao irmão, Helena chora. Tomás sorri pela primeira vez em cem anos. A música para, as portas se abrem, e o sol ilumina a mansão.</p><p><b>Os espíritos estão livres.</b></p>`);
+  b=S.cl.med?[['🚪 Algo se move no último corredor…',()=>{E.classList.remove('on');ending(4)}]]:[]}
+ if(n===2)h=base(`<p class="big">🤐</p><h1>Final 2<br>O silêncio</h1><p>Vocês dizem à cidade que o exorcismo funcionou e guardam a história. Mas, naquela noite, a música volta a tocar. As luzes se acendem no último andar.</p><p>Os espíritos continuam presos. A Presença sorri. <b>Alguém tinha que calar. Ela agora tem mais guardiões do segredo.</b></p>`);
+ if(n===3)h=base(`<p class="big">🌫️</p><h1>Final 3<br>O segredo permanece</h1><p>${forced?'Seus nervos cedem e vocês fogem em pânico. ':''}Vocês deixam a colina sem saber por que os Montenegro continuam ali. Ao olhar para trás, veem uma janela acesa no alto.</p><p>A mansão guarda seu mistério. <b>Talvez outro grupo venha e descubra.</b></p>`);
+ if(n===4){h=base(`<p class="big">🚪</p><h1>Final 4<br>A última porta</h1><p>Com a mansão em paz, uma porta que ninguém vira antes surge no fim do corredor, pulsando como se respirasse. O medalhão em seu bolso esquenta.</p><p>Do outro lado: um cofre de ferro e, sobre ele, um pacto escrito a sangue. Augusto Montenegro vendeu a mansão a algo que mora nas colinas: <i>riqueza em troca de um segredo guardado por toda a geração</i>. A Presença nunca foi Tomás, e sim o <b>Guardião do Pacto</b>, que se alimenta de verdades ocultas.</p><p>A última linha do pacto está em branco, esperando um novo nome.</p>`);
+  b=[['🖋️ Assinar e tomar o lugar do Guardião',()=>{E.classList.remove('on');fin('4A')}],['🔥 Queimar o pacto',()=>{E.classList.remove('on');fin('4B')}]]}
+ B.innerHTML=h+'<div class="row" style="display:flex;flex-direction:column;gap:8px;margin-top:16px">'+b.map((x,i)=>`<button data-i="${i}">${x[0]}</button>`).join('')+'<button data-r="1" style="text-align:center">↺ Jogar de novo</button></div>';
+ B.onclick=e=>{const k=e.target.closest('button');if(!k)return;if(k.dataset.r)location.reload();else b[k.dataset.i][1]()};
+ E.classList.add('on');$('#md').classList.remove('on')}
+function fin(t){
+ const A=t==='4A';const E=$('#end'),B=$('#eb');
+ B.innerHTML=`<div class="tt"><p class="big">${A?'🕯️':'🔥'}</p><h1>Final 4<br>${A?'O novo guardião':'O pacto desfeito'}</h1><p>${A?'Você assina. A mansão silencia, a colina se acalma e a cidade esquece o nome Montenegro. Mas, a cada madrugada, uma música toca no último andar e é você quem a ouve. Você agora guarda a maior verdade da mansão, sozinho.':'Você lança o pacto às chamas. A casa treme, o chão ronca e o Guardião urra. Os vitrais explodem em luz e tudo desmorona em cinzas. Vocês correm, e quando olham para trás, só há colina, grama e silêncio. A mansão acabou, e com ela a maldição.'}</p><div class="row"><button data-r="1" style="text-align:center;margin-top:16px;width:100%">↺ Jogar de novo</button></div></div>`;
+ B.onclick=e=>{if(e.target.closest('button'))location.reload()};E.classList.add('on')}
+function intro(){
+ $('#loc').textContent='Colina dos Montenegro';$('#sc').innerHTML=`<div class="art" style="background:linear-gradient(#2b1f4a,#07050c)"><span>🏚️</span></div><div class="pad tt"><h1>A Mansão<br>Montenegro</h1><p style="text-align:left">Há mais de cem anos, a família Montenegro desapareceu numa única noite. A mansão está abandonada, mas passos ecoam, portas se abrem sozinhas e uma música antiga toca na madrugada. Ninguém jamais chegou ao último andar.</p><p style="text-align:left">Vocês foram contratados para investigar e realizar um exorcismo. Mas os fantasmas não querem expulsá-los: querem <i>mostrar</i> alguma coisa.</p><p>${Object.values(PT).map(x=>x[0]+' '+x[1]).join('<br>')}</p><button id="st" style="width:100%;text-align:center;margin-top:10px">Entrar na mansão</button></div>`;
+ $('#st').onclick=()=>{render();setSan(0.0001)};$('#san i').style.width='100%'}
+intro();
+</script>
+</body>
+</html>
